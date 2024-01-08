@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<style>
+		/* game heading */
+		h1 {
+			color: red;
+			font-size: 45px;
+		}
+
+		/* 3*3 grid of the game */
+		#g1, #g2, #g3, #g4, #g5, #g6, #g7, #g8, #g9 {
+			width: 80px;
+			height: 52px;
+			margin: 5px;
+			border: 1px solid gray;
+			border-radius: 6px;
+			font-size: 30px;
+			text-align: center;
+		}
+
+		/* reset button */
+		#button {
+			box-sizing: border-box;
+			width: 95px;
+			height: 40px;
+			border: 1px solid #3399ff;
+			margin: auto;
+			border-radius: 4px;
+			font-family: Verdana, Geneva, Tahoma, sans-serif;
+			background-color: #3399ff;
+			color: white;
+			font-size: 20px;
+			cursor: pointer;
+		}
+
+		/* player turn */
+		#playerturn {
+			font-family: Verdana, Geneva, Tahoma, sans-serif;
+			color: #3399ff;
+			font-size: 20px;
+		}
+
+		#playerturn.hide {
+		    visibility: hidden; /* hide the toast */
+		}
+
+		#main {
+			text-align: center;
+		}
+
+		/* playing info */
+		#playinfo {
+			font-family: Tahoma, sans-serif;
+			color: #03cafc;
+			font-size: 18px;
+		}
+
+		/* The toast - position it at the bottom and in the middle of the screen */
+		#toast {
+		  visibility: hidden; /* Hidden by default. Visible on click */
+		  min-width: 350px; /* Set a default minimum width */
+		  margin-left: -175px; /* Divide value of min-width by 2 */
+		  background-color: #3399ff;
+		  color: #fff; /* White text color */
+		  text-align: center; /* Centered text */
+		  border-radius: 2px; /* Rounded borders */
+		  padding: 16px; /* Padding */
+		  position: fixed; /* Sit on top of the screen */
+		  z-index: 1; /* Add a z-index if needed */
+		  left: 50%; /* Center the toast */
+		  bottom: 200px; /* 200px from the bottom */
+		  font-family: Tahoma, sans-serif;
+		}
+
+		/* Show the toast when clicking on a button (class added with JavaScript) */
+		#toast.show {
+		  visibility: visible; /* Show the toast */
+		  /* Add animation: Take 0.5 seconds to fade in and out the toast.
+		  However, delay the fade out process for 2.5 seconds */
+		  font-weight: bold;
+		  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+		  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+		}
+
+		#toast.hide {
+		  visibility: hidden; /* hide the toast */
+		}
+
+		/* Animations to fade the toast in and out */
+		@-webkit-keyframes fadein {
+		  from {bottom: 0; opacity: 0;}
+		  to {bottom: 200px; opacity: 1;}
+		}
+
+		@keyframes fadein {
+		  from {bottom: 0; opacity: 0;}
+		  to {bottom: 200px; opacity: 1;}
+		}
+
+		@-webkit-keyframes fadeout {
+		  from {bottom: 200px; opacity: 1;}
+		  to {bottom: 0; opacity: 0;}
+		}
+
+		@keyframes fadeout {
+		  from {bottom: 200px; opacity: 1;}
+		  to {bottom: 0; opacity: 0;}
+		}
+	</style>
+
+
+	<!-- JavaScript file included -->
+	<script type="text/javascript">
+		// function checks turn of the player and put accordingly value X or 0
+		flag = 1; // start with X
+		function checkClick(id, index) {
+			flag == 1 ? (squares[index] = "X", flag = 0) : (squares[index] = "0", flag = 1);
+			document.getElementById(id).value = squares[index];
+			document.getElementById(id).disabled = true;
+
+			checkFinal();
+		}
+
+		// function called whenever user tab on any box
+		var squares = Array(9).fill(null) ;
+		function checkFinal() {
+			// define winning grids
+		    const lines = [
+		        [0, 1, 2],
+		        [3, 4, 5],
+		        [6, 7, 8],
+		        [0, 3, 6],
+		        [1, 4, 7],
+		        [2, 5, 8],
+		        [0, 4, 8],
+		        [2, 4, 6]
+		    ];
+
+		    for (let i = 0; i < lines.length; i++) {
+		        const [a, b, c] = lines[i];
+		        if (squares[a] && squares[a] === squares[b] && squares[b] === squares[c]) {
+		        	  // hide playerturn
+					  var pt = document.getElementById("playerturn");
+					  pt.className = "hide";
+
+		              // Get the toast DIV
+					  var x = document.getElementById("toast");
+
+					  // Add the "show" class to DIV
+					  x.className = "show";
+					  x.innerHTML = "Congratulations! Player "+ squares[a]+ " won";
+
+					  // After 3 seconds, remove the show class from DIV
+					  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+
+					  // disable all clicks till reset
+			  		  for (let i = 0; i < 9; i++) {
+					  	  let y = "g"+(i+1);
+						  document.getElementById(y).disabled = true;
+					  }
+
+					  // end loop once winner is declared
+					  break;
+		        }
+		    }
+
+			// if none of the values are null, match tie
+			if (squares[0] && squares[1] && squares[2] && squares[3] && squares[4] 
+				&& squares[5] && squares[6] && squares[7] && squares[8]) {
+					document.getElementById('playerturn').innerHTML = "Match Tie";
+		              // Get the toast DIV
+					  var x = document.getElementById("toast");
+
+					  // Add the "show" class to DIV
+					  x.className = "show";
+					  x.innerHTML = "Match tie";
+
+					  // After 3 seconds, remove the show class from DIV
+					  setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+			}
+			else 
+			{
+				// print player turn
+				if (flag == 1) {
+					document.getElementById('playerturn').innerHTML = "Player X Turn";
+				}
+				else {
+					document.getElementById('playerturn').innerHTML = "Player 0 Turn";
+				}
+			}
+		}
+
+		// reset game
+		function reset() {
+			location.reload();
+			for (let i = 0; i < 9; i++) {
+				let y = "g"+(i+1);
+				document.getElementById(y).value = '';
+			}
+
+		    var x = document.getElementById("toast");
+
+		    // Add the "show" class to DIV
+		    x.className = "hide";
+			squares = Array(9).fill(null) ;
+		}
+	</script>
+</head>
+
+<body>
+	<div id="main">
+		<h1>TIC TAC TOE</h1>
+
+		<!-- playing info -->
+		<p id="playinfo">First Player starts as <b>Player X</b> And Second Player as <b>Player 0</b>
+		</p>
+
+		<br><br>
+		<!-- 3*3 grid -->
+		<input type="text" id="g1" onclick="checkClick(this.id, 0);" readonly>
+		<input type="text" id="g2" onclick="checkClick(this.id, 1);" readonly>
+		<input type="text" id="g3" onclick="checkClick(this.id, 2);" readonly>
+		<br><br>
+
+		<input type="text" id="g4" onclick="checkClick(this.id, 3);" readonly>
+		<input type="text" id="g5" onclick="checkClick(this.id, 4);" readonly>
+		<input type="text" id="g6" onclick="checkClick(this.id, 5);" readonly>
+		<br><br>
+
+		<input type="text" id="g7" onclick="checkClick(this.id, 6);" readonly>
+		<input type="text" id="g8" onclick="checkClick(this.id, 7);" readonly>
+		<input type="text" id="g9" onclick="checkClick(this.id, 8);" readonly>
+		<!-- grid end -->
+
+		<br><br><br>
+		<!-- reset game -->
+		<button id="button" onclick="reset()">
+			RESET
+		</button>
+
+		<br><br>
+		<!-- show player turn -->
+		<p id="playerturn"></p>
+
+		<!-- toast message -->
+		<div id="toast">Congratutalions!</div>
+	</div>
+</body>
+
+</html>
